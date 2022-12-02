@@ -1,0 +1,5 @@
+﻿  conio2.cpp
+\\Mac\Home\Documents\github\game-go-poland\game-go\game-go\conio2.cpp(402,5): warning C4267: 'argument': conversion from 'size_t' to 'DWORD', possible loss of data
+  game-go.cpp
+  Generating Code...
+  game-go.vcxproj -> \\Mac\Home\Documents\github\game-go-poland\game-go\x64\Debug\game-go.exe
