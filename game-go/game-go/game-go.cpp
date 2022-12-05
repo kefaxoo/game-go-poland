@@ -2,7 +2,9 @@
 #include<stdio.h>
 #include"conio2.h"
 
-#include <string>
+#include <string.h>
+#include <stdlib.h>
+#include <math.h>
 
 /* Comment: in the final program declare appropriate constants, e.g.,
    to eliminate from your program numerical values by replacing them
@@ -14,14 +16,16 @@ const char* STUDENT_NUMBER = "STUDENT_NUMBER";
 const int LOCATION_X_OF_LEGEND = 1;
 const int LOCATION_X_OF_BOARD = 60;
 
+const int SIZE_OF_BOARD = 9;
+
 void drawBoard() {
-	for (int i = LOCATION_X_OF_BOARD; i < LOCATION_X_OF_BOARD + 11; i++) {
+	for (int i = LOCATION_X_OF_BOARD; i < LOCATION_X_OF_BOARD + SIZE_OF_BOARD + 2; i++) {
 		cputs("-");
 		gotoxy(LOCATION_X_OF_BOARD, i - LOCATION_X_OF_BOARD + 1);
 		cputs("|");
-		gotoxy(i, 1 + 10);
+		gotoxy(i, 2 + SIZE_OF_BOARD);
 		cputs("-");
-		gotoxy(LOCATION_X_OF_BOARD + 10, i - LOCATION_X_OF_BOARD + 1);
+		gotoxy(LOCATION_X_OF_BOARD + SIZE_OF_BOARD + 1, i - LOCATION_X_OF_BOARD + 1);
 		cputs("|");
 		gotoxy(i, 1);
 	}
@@ -38,14 +42,35 @@ char* getTitleLine() {
 }
 
 char* getLineLegend(const char* firstPart, const char* secondPart) {
-	char* result = new char[strlen(firstPart) + strlen(secondPart)];
+	char* result = (char*)malloc(strlen(firstPart) + strlen(secondPart));
 	strcpy(result, firstPart);
 	strcat(result, secondPart);
 	return result;
 }
 
+char* intToCharArray(const int& value) {
+	int size = int(log10(value) + 1);
+	char* number = (char*)malloc(size);
+	_itoa(value, number, 10);
+	return number;
+}
+
+char* getLineOfCoordinates(const int& x, const int& y) {
+	char* result = (char*)malloc(27 + strlen(intToCharArray(x)) + strlen(intToCharArray(y)));
+	strcpy(result, "Coordinates of cursor: (");
+	strcat(result, intToCharArray(x));
+	strcat(result, "; ");
+	strcat(result, intToCharArray(y));
+	strcat(result, ")");
+	return result;
+}
+
+bool isCoordinateInInterval(const int& begin, const int& end, const int& coordinate) {
+	return (coordinate > begin && coordinate < end);
+}
+
 int main() {
-	int zn = 0, x = 40, y = 12, attr = 7, back = 0, zero = 0;
+	int zn = 0, x = LOCATION_X_OF_BOARD + 1, y = 2, attr = 7, back = 0, zero = 0;
 	char txt[32];
 	// if the program is compiled in pure C, then we need to initialize
 	// the library ourselves; __cplusplus is defined only if a C++ compiler
@@ -99,10 +124,12 @@ int main() {
 		gotoxy(LOCATION_X_OF_LEGEND, 11);
 		cputs("f      - finish the game");
 		gotoxy(LOCATION_X_OF_LEGEND, 12);
+		cputs(getLineOfCoordinates(x, y));
+		gotoxy(LOCATION_X_OF_LEGEND, 13);
 		// print out the code of the last key pressed
 		if (zero) sprintf(txt, "key code: 0x00 0x%02x", zn);
 		else sprintf(txt, "key code: 0x%02x", zn);
-		gotoxy(LOCATION_X_OF_LEGEND, 13);
+		gotoxy(LOCATION_X_OF_LEGEND, 14);
 		cputs(txt);
 
 		// we draw a star
@@ -124,10 +151,10 @@ int main() {
 		if (zn == 0) {
 			zero = 1;		// if this is the case then we read
 			zn = getch();		// the next code knowing that this
-			if (zn == 0x48) y--;	// will be a special key
-			else if (zn == 0x50) y++;
-			else if (zn == 0x4b) x--;
-			else if (zn == 0x4d) x++;
+			if (zn == 0x48 && isCoordinateInInterval(1, 2 + SIZE_OF_BOARD, y - 1)) y--;	// will be a special key
+			else if (zn == 0x50 && isCoordinateInInterval(1, 2 + SIZE_OF_BOARD, y + 1)) y++;
+			else if (zn == 0x4b && isCoordinateInInterval(LOCATION_X_OF_BOARD, LOCATION_X_OF_BOARD + SIZE_OF_BOARD + 1, x - 1)) x--;
+			else if (zn == 0x4d && isCoordinateInInterval(LOCATION_X_OF_BOARD, LOCATION_X_OF_BOARD + SIZE_OF_BOARD + 1, x + 1)) x++;
 		}
 		else if (zn == ' ') attr = (attr + 1) % 16;
 		else if (zn == 0x0d) back = (back + 1) % 16;	// enter key is 0x0d or '\r'
