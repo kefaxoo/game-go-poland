@@ -69,8 +69,16 @@ bool isCoordinateInInterval(const int& begin, const int& end, const int& coordin
 	return (coordinate > begin && coordinate < end);
 }
 
+const int DEFAULT_ZN = 0;
+const int DEFAULT_X = 1;
+const int DEFAULT_Y = 2;
+const int DEFAULT_ATTR = 7;
+const int DEFAULT_BACK = 0;
+const int DEFAULT_ZERO = 0;
+
 int main() {
-	int zn = 0, x = LOCATION_X_OF_BOARD + 1, y = 2, attr = 7, back = 0, zero = 0;
+	system("cls");
+	int zn = DEFAULT_ZN, x = LOCATION_X_OF_BOARD + DEFAULT_X, y = DEFAULT_Y, attr = DEFAULT_ATTR, back = DEFAULT_BACK, zero = DEFAULT_ZERO;
 	char txt[32];
 	// if the program is compiled in pure C, then we need to initialize
 	// the library ourselves; __cplusplus is defined only if a C++ compiler
@@ -84,6 +92,7 @@ int main() {
 
 	// hide the blinking cursor
 	_setcursortype(_NOCURSOR);
+	
 	do {
 		// we set black to be the background color
 		// check conio2.h for available colors
@@ -93,10 +102,10 @@ int main() {
 		clrscr();
 		// we set the text color (7 == LIGHTGRAY)
 		textcolor(7);
-		
+
 		drawBoard();
-		
-		
+
+
 		// we move the coursor to column 48 and row 1
 		// rows and column are numbered starting with 1
 		gotoxy(LOCATION_X_OF_LEGEND, 1);
@@ -146,6 +155,8 @@ int main() {
 		// one is zero, e.g., "up arrow" is zero and 'H'
 		zero = 0;
 		zn = getch();
+		if (zn == 0x6e)
+			main();
 		// we do not want the key 'H' to play role of "up arrow"
 		// so we check if the first code is zero
 		if (zn == 0) {
