@@ -72,14 +72,48 @@ bool isCoordinateInInterval(const int& begin, const int& end, const int& coordin
 const int DEFAULT_ZN = 0;
 const int DEFAULT_X = 1;
 const int DEFAULT_Y = 2;
-const int DEFAULT_ATTR = 7;
+const int DEFAULT_ATTR = 1;
 const int DEFAULT_BACK = 0;
 const int DEFAULT_ZERO = 0;
 
+int** initMatrix() {
+	int** matrix = (int**)malloc(SIZE_OF_BOARD);
+	for (int i = 0; i < SIZE_OF_BOARD; i++) {
+		matrix[i] = (int*)malloc(SIZE_OF_BOARD);
+		for (int j = 0; j < SIZE_OF_BOARD; j++) {
+			matrix[i][j] = 0;
+		}
+	}
+
+	return matrix;
+}
+
+struct Stone {
+	int x = 0;
+	int y = 0;
+	int color = 0; // 0 - empty // 1 - black(blue) // 2 - white(red)
+};
+
+void drawStones(Stone stones[SIZE_OF_BOARD][SIZE_OF_BOARD]) {
+	for (int i = 0; i < SIZE_OF_BOARD; i++) {
+		for (int j = 0; j < SIZE_OF_BOARD; j++) {
+			if (stones[i][j].color != 0) {
+				gotoxy(stones[i][j].x, stones[i][j].y);
+				textcolor(stones[i][j].color);
+				putch('o');
+			}
+		}
+	}
+}
+
 int main() {
-	system("cls");
 	int zn = DEFAULT_ZN, x = LOCATION_X_OF_BOARD + DEFAULT_X, y = DEFAULT_Y, attr = DEFAULT_ATTR, back = DEFAULT_BACK, zero = DEFAULT_ZERO;
 	char txt[32];
+
+	Stone stones[SIZE_OF_BOARD][SIZE_OF_BOARD];
+	int lastI = 0, lastJ = 0;
+	bool posibilyToCancel = false;
+
 	// if the program is compiled in pure C, then we need to initialize
 	// the library ourselves; __cplusplus is defined only if a C++ compiler
 	// is used
@@ -102,10 +136,10 @@ int main() {
 		clrscr();
 		// we set the text color (7 == LIGHTGRAY)
 		textcolor(7);
-
+		
+		drawStones(stones);
+		textcolor(7);
 		drawBoard();
-
-
 		// we move the coursor to column 48 and row 1
 		// rows and column are numbered starting with 1
 		gotoxy(LOCATION_X_OF_LEGEND, 1);
@@ -157,6 +191,37 @@ int main() {
 		zn = getch();
 		if (zn == 0x6e)
 			main();
+		else if (zn == 0x69) {
+			int i = x - DEFAULT_X - LOCATION_X_OF_BOARD, j = y - DEFAULT_Y;
+
+			if (stones[i][j].color == 0) {
+				putch('o');
+				stones[i][j].x = x;
+				stones[i][j].y = y;
+				stones[i][j].color = attr;
+				attr = attr == 1 ? 4 : 1;
+				lastI = i;
+				lastJ = j;
+				posibilyToCancel = true;
+			}
+
+			textcolor(7);
+		}
+		else if (zn == 0x1b) {
+			if (posibilyToCancel) {
+				x = stones[lastI][lastJ].x;
+				y = stones[lastI][lastJ].y;
+				gotoxy(x, y);
+				textcolor(stones[lastI][lastJ].color);
+				attr = stones[lastI][lastJ].color;
+
+				stones[lastI][lastJ].x = 0;
+				stones[lastI][lastJ].y = 0;
+				stones[lastI][lastJ].color = 0;
+				posibilyToCancel = false;
+			}
+		};
+		
 		// we do not want the key 'H' to play role of "up arrow"
 		// so we check if the first code is zero
 		if (zn == 0) {
