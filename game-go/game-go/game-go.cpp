@@ -49,7 +49,7 @@ char* getLineLegend(const char* firstPart, const char* secondPart) {
 }
 
 char* intToCharArray(const int& value) {
-	int size = int(log10(value) + 1);
+	int size = value == 0 ? 1 : int(log10(value) + 1);
 	char* number = (char*)malloc(size);
 	_itoa(value, number, 10);
 	return number;
@@ -144,6 +144,26 @@ void checkStones(Stone stones[SIZE_OF_BOARD][SIZE_OF_BOARD], const int& colorCod
 	}
 }
 
+char* getLineOfScore(const int& player, const int& score) {
+	char* result = (char*)malloc(19 + strlen(intToCharArray(score)));
+	strcpy(result, "Score of player ");
+	strcat(result, intToCharArray(player));
+	strcat(result, ": ");
+	strcat(result, intToCharArray(score));
+	return result;
+}
+
+void getScore(int& score1, int& score2, Stone stones[SIZE_OF_BOARD][SIZE_OF_BOARD]) {
+	score1 = 0;
+	score2 = 0;
+	for (int i = 0; i < SIZE_OF_BOARD; i++) {
+		for (int j = 0; j < SIZE_OF_BOARD; j++) {
+			score1 = stones[i][j].color == 1 ? score1 + 1 : score1;
+			score2 = stones[i][j].color == 4 ? score2 + 1 : score2;
+		}
+	}
+}
+
 int main() {
 	int zn = DEFAULT_ZN, x = LOCATION_X_OF_BOARD + DEFAULT_X, y = DEFAULT_Y, attr = DEFAULT_ATTR, back = DEFAULT_BACK, zero = DEFAULT_ZERO;
 	char txt[32];
@@ -151,6 +171,7 @@ int main() {
 	Stone stones[SIZE_OF_BOARD][SIZE_OF_BOARD];
 	int lastI = 0, lastJ = 0;
 	bool posibilyToCancel = false;
+	int score1 = 0, score2 = 0;
 
 	// if the program is compiled in pure C, then we need to initialize
 	// the library ourselves; __cplusplus is defined only if a C++ compiler
@@ -207,10 +228,14 @@ int main() {
 		gotoxy(LOCATION_X_OF_LEGEND, 12);
 		cputs(getLineOfCoordinates(x, y));
 		gotoxy(LOCATION_X_OF_LEGEND, 13);
+		cputs(getLineOfScore(1, score1));
+		gotoxy(LOCATION_X_OF_LEGEND, 14);
+		cputs(getLineOfScore(2, score2));
+		gotoxy(LOCATION_X_OF_LEGEND, 15);
 		// print out the code of the last key pressed
 		if (zero) sprintf(txt, "key code: 0x00 0x%02x", zn);
 		else sprintf(txt, "key code: 0x%02x", zn);
-		gotoxy(LOCATION_X_OF_LEGEND, 14);
+		gotoxy(LOCATION_X_OF_LEGEND, 16);
 		cputs(txt);
 
 		// we draw a star
@@ -242,8 +267,6 @@ int main() {
 				attr = attr == 1 ? 4 : 1;
 				lastI = i;
 				lastJ = j;
-				
-				
 			}
 
 			textcolor(7);
@@ -262,6 +285,8 @@ int main() {
 				posibilyToCancel = false;
 			}
 		};
+
+		getScore(score1, score2, stones);
 		
 		// we do not want the key 'H' to play role of "up arrow"
 		// so we check if the first code is zero
