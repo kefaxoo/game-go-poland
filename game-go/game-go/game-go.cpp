@@ -76,18 +76,6 @@ const int DEFAULT_ATTR = 1;
 const int DEFAULT_BACK = 0;
 const int DEFAULT_ZERO = 0;
 
-int** initMatrix() {
-	int** matrix = (int**)malloc(SIZE_OF_BOARD);
-	for (int i = 0; i < SIZE_OF_BOARD; i++) {
-		matrix[i] = (int*)malloc(SIZE_OF_BOARD);
-		for (int j = 0; j < SIZE_OF_BOARD; j++) {
-			matrix[i][j] = 0;
-		}
-	}
-
-	return matrix;
-}
-
 struct Stone {
 	int x = 0;
 	int y = 0;
@@ -101,6 +89,56 @@ void drawStones(Stone stones[SIZE_OF_BOARD][SIZE_OF_BOARD]) {
 				gotoxy(stones[i][j].x, stones[i][j].y);
 				textcolor(stones[i][j].color);
 				putch('o');
+			}
+		}
+	}
+}
+
+int getIndexFromCoordinatesX(const int& x) {
+	return x - LOCATION_X_OF_BOARD - DEFAULT_X;
+}
+
+int getIndexFromCoordinatesY(const int& y) {
+	return y - DEFAULT_Y;
+}
+
+void checkStones(Stone stones[SIZE_OF_BOARD][SIZE_OF_BOARD], const int& colorCode, bool& posibilityToCancel) {
+	for (int i = 0; i < SIZE_OF_BOARD; i++) {
+		for (int j = 0; j < SIZE_OF_BOARD; j++) {
+			
+
+			if (stones[i][j].color == 0) {
+				continue;
+			}
+
+			int hp = 4;
+			if (i == 0 || i == SIZE_OF_BOARD - 1) {
+				hp--;
+			}
+
+			if (j == 0 || j == SIZE_OF_BOARD - 1) {
+				hp--;
+			}
+
+			if (i > 0 && stones[i - 1][j].color != stones[i][j].color && stones[i - 1][j].color != 0) {
+				hp--;
+			}
+
+			if (i < SIZE_OF_BOARD - 1 && stones[i+1][j].color != stones[i][j].color && stones[i + 1][j].color != 0) {
+				hp--;
+			}
+
+			if (j > 0 && stones[i][j - 1].color != stones[i][j].color && stones[i][j - 1].color != 0) {
+				hp--;
+			}
+
+			if (j < SIZE_OF_BOARD - 1 && stones[i][j + 1].color != stones[i][j].color && stones[i][j + 1].color != 0) {
+				hp--;
+			}
+
+			if (hp == 0 && colorCode != stones[i][j].color) {
+				stones[i][j].color = 0;
+				posibilityToCancel = false;
 			}
 		}
 	}
@@ -193,16 +231,19 @@ int main() {
 			main();
 		else if (zn == 0x69) {
 			int i = x - DEFAULT_X - LOCATION_X_OF_BOARD, j = y - DEFAULT_Y;
-
+			
 			if (stones[i][j].color == 0) {
 				putch('o');
 				stones[i][j].x = x;
 				stones[i][j].y = y;
 				stones[i][j].color = attr;
+				posibilyToCancel = true;
+				checkStones(stones, attr, posibilyToCancel);
 				attr = attr == 1 ? 4 : 1;
 				lastI = i;
 				lastJ = j;
-				posibilyToCancel = true;
+				
+				
 			}
 
 			textcolor(7);
