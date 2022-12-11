@@ -17,7 +17,7 @@ const int LOCATION_X_OF_LEGEND = 1;
 const int LOCATION_X_OF_BOARD = 60;
 
 int SIZE_OF_BOARD = 9;
-const int MAX_SIZE_OF_BOARD = 19;
+const int MAX_SIZE_OF_BOARD = 20;
 
 void drawBoard() {
 	for (int i = LOCATION_X_OF_BOARD; i < LOCATION_X_OF_BOARD + SIZE_OF_BOARD + 2; i++) {
@@ -165,6 +165,19 @@ void getScore(int& score1, int& score2, Stone stones[MAX_SIZE_OF_BOARD][MAX_SIZE
 	}
 }
 
+char* getLineOfSize() {
+		char* result = (char*)malloc(16 + 2 * strlen(intToCharArray(SIZE_OF_BOARD)));
+		strcpy(result, "Size of board: ");
+		strcat(result, intToCharArray(SIZE_OF_BOARD));
+		strcat(result, "x");
+		strcat(result, intToCharArray(SIZE_OF_BOARD));
+		return result;
+}
+
+bool closeGame = false;
+int score1 = 0;
+int score2 = 0;
+
 int main() {
 	int zn = DEFAULT_ZN, x = LOCATION_X_OF_BOARD + DEFAULT_X, y = DEFAULT_Y, attr = DEFAULT_ATTR, back = DEFAULT_BACK, zero = DEFAULT_ZERO;
 	char txt[32];
@@ -172,7 +185,8 @@ int main() {
 	Stone stones[MAX_SIZE_OF_BOARD][MAX_SIZE_OF_BOARD];
 	int lastI = 0, lastJ = 0;
 	bool posibilyToCancel = false;
-	int score1 = 0, score2 = 0;
+	score1 = 0;
+	score2 = 0;
 
 	// if the program is compiled in pure C, then we need to initialize
 	// the library ourselves; __cplusplus is defined only if a C++ compiler
@@ -227,7 +241,7 @@ int main() {
 		gotoxy(LOCATION_X_OF_LEGEND, 11);
 		cputs("f      - finish the game");
 		gotoxy(LOCATION_X_OF_LEGEND, 12);
-		cputs("+      - change board size");
+		cputs("+/-    - change board size");
 		gotoxy(LOCATION_X_OF_LEGEND, 13);
 		cputs(getLineOfCoordinates(x, y));
 		gotoxy(LOCATION_X_OF_LEGEND, 14);
@@ -235,10 +249,12 @@ int main() {
 		gotoxy(LOCATION_X_OF_LEGEND, 15);
 		cputs(getLineOfScore(2, score2));
 		gotoxy(LOCATION_X_OF_LEGEND, 16);
+		cputs(getLineOfSize());
+		gotoxy(LOCATION_X_OF_LEGEND, 17);
 		// print out the code of the last key pressed
 		if (zero) sprintf(txt, "key code: 0x00 0x%02x", zn);
 		else sprintf(txt, "key code: 0x%02x", zn);
-		gotoxy(LOCATION_X_OF_LEGEND, 18);
+		gotoxy(LOCATION_X_OF_LEGEND, 19);
 		cputs(txt);
 
 		// we draw a star
@@ -248,6 +264,10 @@ int main() {
 		// putch prints one character and moves the cursor to the right
 		putch('*');
 
+		if (closeGame) {
+			break;
+		}
+		
 		// we wait for key press and get its code
 		// most key codes correspond to the characters, like
 		// a is 'a', 2 is '2', + is '+', but some special keys
@@ -257,45 +277,38 @@ int main() {
 		zn = getch();
 		if (zn == 0x6e)
 			main();
-		else if (zn == 0x3d) {
-			switch (SIZE_OF_BOARD) {
-				case 9: {
-					SIZE_OF_BOARD = 13;
-					main();
-				}
-					  break;
-				case 13: {
-					SIZE_OF_BOARD = 19;
-					main();
-				}
-					   break;
-				default:
-				{
-					SIZE_OF_BOARD = 9;
-					main();
-				}
-			}
+		if (zn == 0x3d && SIZE_OF_BOARD + 1 <= 20) {
+			SIZE_OF_BOARD++;
+			main();
 		}
-		else if (zn == 0x2d) {
-			switch (SIZE_OF_BOARD) {
-			case 9: {
-				SIZE_OF_BOARD = 19;
-				main();
-			}
-				  break;
-			case 13: {
-				SIZE_OF_BOARD = 9;
-				main();
-			}
-				   break;
-			default:
-			{
-				SIZE_OF_BOARD = 13;
-				main();
-			}
-			}
+		
+		if (zn == 0x2d && SIZE_OF_BOARD - 1 >= 5) {
+			SIZE_OF_BOARD--;
+			main();
 		}
-		else if (zn == 0x69) {
+		
+		if (zn == 'q') {
+			closeGame = true;
+			break;
+		}
+		
+		if (zn == 'f') {
+			clrscr();
+			textcolor(LIGHTGRAY);
+			gotoxy(1, 1);
+			cputs("Results: ");
+			cputs(score1 > score2 ? "First player won" : "Second player won");
+			gotoxy(1, 2);
+			cputs("First player score: ");
+			cputs(intToCharArray(score1));
+			gotoxy(1, 3);
+			cputs("Second player score: ");
+			cputs(intToCharArray(score2));
+			closeGame = true;
+			break;
+		}
+		
+		if (zn == 0x69) {
 			int i = x - DEFAULT_X - LOCATION_X_OF_BOARD, j = y - DEFAULT_Y;
 			
 			if (stones[i][j].color == 0) {
@@ -341,7 +354,7 @@ int main() {
 		}
 		else if (zn == ' ') attr = (attr + 1) % 16;
 		else if (zn == 0x0d) back = (back + 1) % 16;	// enter key is 0x0d or '\r'
-	} while (zn != 'q');
+	} while (!closeGame);
 
 	_setcursortype(_NORMALCURSOR);	// show the cursor so it will be
 	// visible after the program ends
