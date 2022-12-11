@@ -235,26 +235,22 @@ int main() {
 		gotoxy(LOCATION_X_OF_LEGEND, 8);
 		cputs("i      - place a stone on the board");
 		gotoxy(LOCATION_X_OF_LEGEND, 9);
-		cputs("s      - save the game state");
-		gotoxy(LOCATION_X_OF_LEGEND, 10);
-		cputs("l      - load the game state");
-		gotoxy(LOCATION_X_OF_LEGEND, 11);
 		cputs("f      - finish the game");
-		gotoxy(LOCATION_X_OF_LEGEND, 12);
+		gotoxy(LOCATION_X_OF_LEGEND, 10);
 		cputs("+/-    - change board size");
-		gotoxy(LOCATION_X_OF_LEGEND, 13);
+		gotoxy(LOCATION_X_OF_LEGEND, 11);
 		cputs(getLineOfCoordinates(x, y));
-		gotoxy(LOCATION_X_OF_LEGEND, 14);
+		gotoxy(LOCATION_X_OF_LEGEND, 12);
 		cputs(getLineOfScore(1, score1));
-		gotoxy(LOCATION_X_OF_LEGEND, 15);
+		gotoxy(LOCATION_X_OF_LEGEND, 13);
 		cputs(getLineOfScore(2, score2));
-		gotoxy(LOCATION_X_OF_LEGEND, 16);
+		gotoxy(LOCATION_X_OF_LEGEND, 14);
 		cputs(getLineOfSize());
-		gotoxy(LOCATION_X_OF_LEGEND, 17);
+		gotoxy(LOCATION_X_OF_LEGEND, 15);
 		// print out the code of the last key pressed
 		if (zero) sprintf(txt, "key code: 0x00 0x%02x", zn);
 		else sprintf(txt, "key code: 0x%02x", zn);
-		gotoxy(LOCATION_X_OF_LEGEND, 19);
+		gotoxy(LOCATION_X_OF_LEGEND, 17);
 		cputs(txt);
 
 		// we draw a star
@@ -304,6 +300,7 @@ int main() {
 			gotoxy(1, 3);
 			cputs("Second player score: ");
 			cputs(intToCharArray(score2));
+			gotoxy(1, 4);
 			closeGame = true;
 			break;
 		}
