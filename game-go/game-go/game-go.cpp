@@ -16,7 +16,8 @@ const char* STUDENT_NUMBER = "STUDENT_NUMBER";
 const int LOCATION_X_OF_LEGEND = 1;
 const int LOCATION_X_OF_BOARD = 60;
 
-const int SIZE_OF_BOARD = 9;
+int SIZE_OF_BOARD = 9;
+const int MAX_SIZE_OF_BOARD = 19;
 
 void drawBoard() {
 	for (int i = LOCATION_X_OF_BOARD; i < LOCATION_X_OF_BOARD + SIZE_OF_BOARD + 2; i++) {
@@ -82,7 +83,7 @@ struct Stone {
 	int color = 0; // 0 - empty // 1 - black(blue) // 2 - white(red)
 };
 
-void drawStones(Stone stones[SIZE_OF_BOARD][SIZE_OF_BOARD]) {
+void drawStones(Stone stones[MAX_SIZE_OF_BOARD][MAX_SIZE_OF_BOARD]) {
 	for (int i = 0; i < SIZE_OF_BOARD; i++) {
 		for (int j = 0; j < SIZE_OF_BOARD; j++) {
 			if (stones[i][j].color != 0) {
@@ -102,7 +103,7 @@ int getIndexFromCoordinatesY(const int& y) {
 	return y - DEFAULT_Y;
 }
 
-void checkStones(Stone stones[SIZE_OF_BOARD][SIZE_OF_BOARD], const int& colorCode, bool& posibilityToCancel) {
+void checkStones(Stone stones[MAX_SIZE_OF_BOARD][MAX_SIZE_OF_BOARD], const int& colorCode, bool& posibilityToCancel) {
 	for (int i = 0; i < SIZE_OF_BOARD; i++) {
 		for (int j = 0; j < SIZE_OF_BOARD; j++) {
 			
@@ -153,7 +154,7 @@ char* getLineOfScore(const int& player, const int& score) {
 	return result;
 }
 
-void getScore(int& score1, int& score2, Stone stones[SIZE_OF_BOARD][SIZE_OF_BOARD]) {
+void getScore(int& score1, int& score2, Stone stones[MAX_SIZE_OF_BOARD][MAX_SIZE_OF_BOARD]) {
 	score1 = 0;
 	score2 = 0;
 	for (int i = 0; i < SIZE_OF_BOARD; i++) {
@@ -168,7 +169,7 @@ int main() {
 	int zn = DEFAULT_ZN, x = LOCATION_X_OF_BOARD + DEFAULT_X, y = DEFAULT_Y, attr = DEFAULT_ATTR, back = DEFAULT_BACK, zero = DEFAULT_ZERO;
 	char txt[32];
 
-	Stone stones[SIZE_OF_BOARD][SIZE_OF_BOARD];
+	Stone stones[MAX_SIZE_OF_BOARD][MAX_SIZE_OF_BOARD];
 	int lastI = 0, lastJ = 0;
 	bool posibilyToCancel = false;
 	int score1 = 0, score2 = 0;
@@ -226,16 +227,18 @@ int main() {
 		gotoxy(LOCATION_X_OF_LEGEND, 11);
 		cputs("f      - finish the game");
 		gotoxy(LOCATION_X_OF_LEGEND, 12);
-		cputs(getLineOfCoordinates(x, y));
+		cputs("+      - change board size");
 		gotoxy(LOCATION_X_OF_LEGEND, 13);
-		cputs(getLineOfScore(1, score1));
+		cputs(getLineOfCoordinates(x, y));
 		gotoxy(LOCATION_X_OF_LEGEND, 14);
-		cputs(getLineOfScore(2, score2));
+		cputs(getLineOfScore(1, score1));
 		gotoxy(LOCATION_X_OF_LEGEND, 15);
+		cputs(getLineOfScore(2, score2));
+		gotoxy(LOCATION_X_OF_LEGEND, 16);
 		// print out the code of the last key pressed
 		if (zero) sprintf(txt, "key code: 0x00 0x%02x", zn);
 		else sprintf(txt, "key code: 0x%02x", zn);
-		gotoxy(LOCATION_X_OF_LEGEND, 16);
+		gotoxy(LOCATION_X_OF_LEGEND, 18);
 		cputs(txt);
 
 		// we draw a star
@@ -254,6 +257,25 @@ int main() {
 		zn = getch();
 		if (zn == 0x6e)
 			main();
+		else if (zn == 0x3d) {
+			switch (SIZE_OF_BOARD) {
+				case 9: {
+					SIZE_OF_BOARD = 13;
+					main();
+				}
+					  break;
+				case 13: {
+					SIZE_OF_BOARD = 19;
+					main();
+				}
+					   break;
+				default:
+				{
+					SIZE_OF_BOARD = 9;
+					main();
+				}
+			}
+		}
 		else if (zn == 0x69) {
 			int i = x - DEFAULT_X - LOCATION_X_OF_BOARD, j = y - DEFAULT_Y;
 			
