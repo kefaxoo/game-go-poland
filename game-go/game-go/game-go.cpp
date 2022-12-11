@@ -276,6 +276,25 @@ int main() {
 				}
 			}
 		}
+		else if (zn == 0x2d) {
+			switch (SIZE_OF_BOARD) {
+			case 9: {
+				SIZE_OF_BOARD = 19;
+				main();
+			}
+				  break;
+			case 13: {
+				SIZE_OF_BOARD = 9;
+				main();
+			}
+				   break;
+			default:
+			{
+				SIZE_OF_BOARD = 13;
+				main();
+			}
+			}
+		}
 		else if (zn == 0x69) {
 			int i = x - DEFAULT_X - LOCATION_X_OF_BOARD, j = y - DEFAULT_Y;
 			
